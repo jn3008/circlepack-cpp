@@ -22,6 +22,28 @@ This project was created with some creative and technical input from [@Bleuje](h
 
 ## Usage
 
+## Functions
+### Remove vertex
+Select a vertex and delete it. If the selected vertex is an interior vertex, fill the void it creates by connecting its petals in a zig-zag fashion. If deleting a vertex leaves a neighbour with only two petals remaining, it is also removed (this might also lead to subsequent deletions).
+
+![function_remove](doc/function_remove.gif)
+
+### Flip edge
+Select two vertices, with at least one being interior, then they have two mutual petals. This function disconnects the two selected vertices and connects their two mutual petals.
+
+![function_flipedge](doc/function_flipedge.gif)
+
+### Replace edge with new vertex
+Select two vertices. This function disconnects them and adds a new vertex, this vertex is connected both selected vertices and any mutual petals of the selected vertices.
+
+![function_edgetovertex](doc/function_edgetovertex.gif)
+
+### Add new vertex in a face
+Select two vertices. These two vertices have two mutual petals (one if they're both boundaries) that makes a face (triangle). This function adds a new vertex connected to the three vertices of the chosen face.
+
+![function_edgetovertex](doc/function_facetovertex.gif)
+
+
 ### Both modes
 | Input | Description |
 | ----------- | ----------- |
@@ -38,26 +60,13 @@ This project was created with some creative and technical input from [@Bleuje](h
 | **DOWN** | Flip edge |
 | **UP** | Replace edge with new vertex |
 | **LEFT/RIGHT** | Add new vertex in a face |
-### 'Fixed boundary angle' mode
+### 'Fixed boundary angles' mode
 | Input | Description |
 | ----------- | ----------- |
 | **LEFT CLICK** | Select vertex |
 | **UP/DOWN** | Increase/decrease boundary angle |
 | **LEFT/RIGHT** | Navigate boundary vertices |
 
-<!-- | **R** | Remove vertex | -->
-<!-- | **Escape** | **quit** the app |
-| arrows **up** / **down** (or **W** / **X**)   | function selection navigation / change cursor position |
-| arrows **left** / **right** (or **C** / **V**)  | change function at cursor |
-| **S** | **save** picture (with timestamp in filename), also saves the list of functions in a text file. Both in "data/images" folder | 
-| **Q** | randomize parameters of function at cursor (not possible for all variations) |
-| **Y** | randomize parameters of all functions |
-| **Z** | change all functions randomly |
-| **F** / **D** | add / remove function above cursor |
-| **P** / **O** | add / remove function at the end of the list |
-| **N** | change **color** mode |
-| **!** (exclamation mark) | activate/deactivate the **3D mode** |
-| **E**| change "bounding mode" of drawing | -->
 
 
 
