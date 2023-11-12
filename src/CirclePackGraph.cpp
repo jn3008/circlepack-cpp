@@ -219,6 +219,9 @@ void CirclePackGraph::remove_and_fill(int vertex_index, std::vector<GraphOperati
     // wasn't called by itself.
     bool push_edit_to_history_stack = edit_to_graph.empty();
 
+    // Are we deleting a boundary vertex
+    bool is_boundary_vertex = is_bound(vertex_index);
+
     int len = petals.size();
     std::cout << "Remove and fill vertex " << vertex_index << ", #petals: " << len << std::endl;
 
@@ -228,7 +231,7 @@ void CirclePackGraph::remove_and_fill(int vertex_index, std::vector<GraphOperati
     // planar graphs in general though). Keep trying with different offsets
     // for making the connections, until giving up.
     bool problem = false;
-    if (len > 3 && !is_bound(vertex_index))
+    if (len > 3 && !is_boundary_vertex)
     {
         std::vector<std::array<int, 2>> pairs;
         for (int i = 0; i < len - 3; i++)
@@ -277,19 +280,18 @@ void CirclePackGraph::remove_and_fill(int vertex_index, std::vector<GraphOperati
                                                .vertex_index_2 = vertex_index});
     }
 
+    // Update the graph structure
     auto_set_bounds();
     update_petals();
 
-    if (is_bound(vertex_index))
-    {
-        std::array<int, 2> boundary_petals{petals.front(), petals.back()};
-        for (int boundary_petal : boundary_petals)
-            if (get_petals(boundary_petal).size() < 3)
-            {
-                std::cout << "Removing " << vertex_index << " also removes " << boundary_petal << std::endl;
-                remove_and_fill(boundary_petal, edit_to_graph);
-            }
-    }
+    // If removing the current vertex leaves another vertex with
+    // two petals left, remove it also.
+    for (int petal : petals)
+        if (get_petals(petal).size() < 3)
+        {
+            std::cout << "Removing " << vertex_index << " also removes " << petal << std::endl;
+            remove_and_fill(petal, edit_to_graph);
+        }
 
     if (push_edit_to_history_stack)
         history_stack.push(edit_to_graph);

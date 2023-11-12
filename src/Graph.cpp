@@ -67,7 +67,7 @@ Graph Graph::example_graph_AxB(int A, int B)
 // to Vertex objects into CirclePackVertex objects.
 void Graph::add_adjacency(int vertex_index_1, int vertex_index_2)
 {
-    // std::cout << "Add adjacency : " << vertex_index_1 << "," << vertex_index_2 << std::endl;
+    std::cout << "Add adjacency : " << vertex_index_1 << "," << vertex_index_2 << std::endl;
     // Ensure no vertex index is negative
     assert(min(vertex_index_1, vertex_index_2) >= 0);
 
@@ -98,7 +98,7 @@ void Graph::add_adjacency(int vertex_index_1, int vertex_index_2)
 // that is, set their adjacency value to false.
 void Graph::remove_adjacency(int vertex_index_1, int vertex_index_2)
 {
-    // std::cout << "Remove adjacency : " << vertex_index_1 << "," << vertex_index_2 << std::endl;
+    std::cout << "Remove adjacency : " << vertex_index_1 << "," << vertex_index_2 << std::endl;
     assert(min(vertex_index_1, vertex_index_2) >= 0 && min(vertex_index_1, vertex_index_2) < n);
     adjacencies[max(vertex_index_1, vertex_index_2)][min(vertex_index_1, vertex_index_2)] = false;
 }
@@ -114,7 +114,9 @@ void Graph::auto_set_bounds()
     for (int i = 0; i < n; i++)
     {
         std::vector<int> petals = get_petals(i);
-        set_bound(i, !path_exists(petals, 1, true) && exists(i));
+        bool is_boundary = !path_exists(petals, 1, true);
+        is_boundary |= petals.size() < 3; // Say it's a boundary if it has less than 3 petals
+        set_bound(i, is_boundary && exists(i));
     }
 }
 

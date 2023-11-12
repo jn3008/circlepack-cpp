@@ -328,7 +328,8 @@ public:
             // Set the angle sum targets of the boundary vertices
             // to be their current angle sums.
             graph.auto_set_targets();
-            // Deselect second selection
+            // Deselect both selections
+            set_selected(nullptr);
             set_second_selected(nullptr);
         }
         // If backspace is pressed, toggle theme
