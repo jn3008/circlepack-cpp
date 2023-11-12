@@ -219,11 +219,10 @@ void CirclePackGraph::remove_and_fill(int vertex_index, std::vector<GraphOperati
     // wasn't called by itself.
     bool push_edit_to_history_stack = edit_to_graph.empty();
 
-    // Are we deleting a boundary vertex
-    bool is_boundary_vertex = is_bound(vertex_index);
-
     int len = petals.size();
-    std::cout << "Remove and fill vertex " << vertex_index << ", #petals: " << len << std::endl;
+    std::cout << "Remove" << (is_bound(vertex_index) ? " boundary " : " ")
+              << "vertex " << vertex_index
+              << ", #petals: " << len << std::endl;
 
     // check first whether adding these edges will cause a problem, namely
     // adding an adjacency that already exists, it should be impossible to
@@ -231,7 +230,7 @@ void CirclePackGraph::remove_and_fill(int vertex_index, std::vector<GraphOperati
     // planar graphs in general though). Keep trying with different offsets
     // for making the connections, until giving up.
     bool problem = false;
-    if (len > 3 && !is_boundary_vertex)
+    if (len > 3 && !is_bound(vertex_index))
     {
         std::vector<std::array<int, 2>> pairs;
         for (int i = 0; i < len - 3; i++)
@@ -600,13 +599,6 @@ void CirclePackGraph::recenter_scale(float width, float height)
 // if nothing was found return a nullptr.
 Vertex *CirclePackGraph::get_circle_at_position(ofVec2f pos) const
 {
-    // for (Vertex *v : vertices)
-    // {
-    //     ofVec2f vertex_pos = static_cast<CirclePackVertex *>(v)->get_pos();
-    //     float vertex_label = static_cast<CirclePackVertex *>(v)->get_label();
-    //     if ((vertex_pos - pos).length() < vertex_label)
-    //         return v;
-    // }
     for (int i = 0; i < n; i++)
     {
         if (!exists(i))
@@ -652,6 +644,8 @@ void CirclePackGraph::undo()
     // Check there is an edit to undo
     if (history_stack.empty())
         return;
+
+    std::cout << "Undo" << std::endl;
 
     std::vector<GraphOperation> latest_edit = history_stack.top();
     history_stack.pop();

@@ -19,6 +19,7 @@ private:
     bool theme = false, // false: dark, true: light
         mode = false;   // false: fix boundary labels, true: fix boundary angles
 
+    // Two lists of instructions to display, depending on the mode.
     std::array<std::vector<std::string>, 2> instructions{
         std::vector<std::string>{
             "BACKSPACE : undo",
@@ -111,19 +112,18 @@ public:
         // Draw edges
         for (int i = 0; i < graph.get_n(); i++)
         {
-            if (!graph.exists(i))
+            if (!graph.exists(i)) // Skip if the circle isn't a part of the packing anymore
                 continue;
 
             ofVec2f pos = graph.get_pos(i);
             ofSetLineWidth(theme ? 2 : 1);
-            for (int j = i; j < graph.get_n(); j++)
-            {
+            ofSetColor(125);
+
+            // Draw a line between each pair of adjacent vertices by
+            // avoiding drawing the same line twice.
+            for (int j = i+1; j < graph.get_n(); j++)
                 if (graph.is_adjacent(i, j))
-                {
-                    ofSetColor(125);
                     ofDrawLine(pos, graph.get_pos(j));
-                }
-            }
         }
     }
 
@@ -182,16 +182,19 @@ public:
     {
         int vertex_index = v->get_index();
 
+        // Draw vertex index
         std::string str = "Index:  " + std::to_string(vertex_index);
         height_offset += font.getAscenderHeight();
         font.drawString(str, margin, height_offset);
-
+        // Draw vertex's petals' indices
         str = "Petals: " + v->get_petals_string();
         height_offset += font.getAscenderHeight();
         font.drawString(str, margin, height_offset);
 
         if (!mode)
             return;
+
+        // If in 'Fix boundary target angles' mode, draw the vertex's angle sum target
         str = "Target: " + std::to_string(graph.get_target_ang(vertex_index)) + "rad";
         height_offset += font.getAscenderHeight();
         font.drawString(str, margin, height_offset);
@@ -222,33 +225,41 @@ public:
         }
     }
 
+    // -------------------------------------------------------------------------
+    // Update the start drag position of the mouse, used for correctly updating
+    // the 'view_translation'
     void update_start_drag(ofVec2f mouse)
     {
         start_drag_position = mouse - graph.get_view_translation() * graph.get_view_scale();
     }
+    // -------------------------------------------------------------------------
+    // Update the 'view_translation' correctly by considering the 'view_scale' too
     void update_view_translation(ofVec2f mouse)
     {
         graph.set_view_translation((mouse - start_drag_position) / graph.get_view_scale());
         graph.recenter_scale();
     }
+    // -------------------------------------------------------------------------
+    // Exponentially adjust the 'view_scale' with the scroll event.
     void update_view_scale(float scrollY)
     {
         graph.set_view_scale(pow(2, log2(graph.get_view_scale()) + scrollY * 0.2));
         graph.recenter_scale();
     }
 
+    // -------------------------------------------------------------------------
+    // Perform computations to update the labels of the vertices and
+    // re-compute their positions.
     void update_packing(int num_iterations)
     {
-        // ------------------------------------------------------------
         for (int i = 0; i < num_iterations; i++)
         {
-            if (mode)
+            if (mode) // 'Fix boundary target angles' mode
                 graph.compute_labels_by_fixing_boundary_targets();
-            else
+            else // 'Fix boundary target labels mode'
                 graph.compute_labels_by_fixing_boundary_labels();
         }
         graph.compute_positions();
-        // ------------------------------------------------------------
     }
 
     void key_pressed(int key)
@@ -264,14 +275,17 @@ public:
         // If left or right arrow is pressed
         else if (key == OF_KEY_LEFT || key == OF_KEY_RIGHT)
         {
-            if (mode) // 'Fix boundary target angles mode'
+            if (mode) // 'Fix boundary target angles' mode
             {
+                // Navigate to the next boundary vertex, depending on whether the
+                // left or right key is pressed, this will be the 0th or -1th
+                // (i.e. size()-1) petal of the current selected vertex.
                 if (selected_vertex)
                     set_selected(graph.get_petal_pointer_of(
                         selected_vertex->get_index(),
                         key == OF_KEY_LEFT ? 0 : -1));
             }
-            else if (second_selected_vertex) // 'Fix boundary target labels mode'
+            else if (second_selected_vertex) // 'Fix boundary target labels' mode
             {
                 // If two vertices are selected, add a vertex in the face/triangle 'left'/'right'
                 // of the edge made by those two vertices
@@ -285,11 +299,13 @@ public:
         {
             if (mode) // 'Fix boundary target angles mode'
             {
+                // Increase or decrease the angle sum target of the currently
+                // selected boundary vertex.
                 if (selected_vertex)
                     graph.adjust_target_ang(selected_vertex->get_index(),
                                             (key == OF_KEY_UP ? 1 : -1) * 0.02);
             }
-            else if (second_selected_vertex) // 'Fix boundary target labels mode'
+            else if (second_selected_vertex) // 'Fix boundary target labels' mode
             {
                 if (key == OF_KEY_UP)
                 {
@@ -332,10 +348,16 @@ public:
             set_selected(nullptr);
             set_second_selected(nullptr);
         }
-        // If backspace is pressed, toggle theme
+        // If 't' is pressed, toggle theme
         else if (key == 't')
         {
             theme = !theme;
+        }
+        // If 'p' is pressed, print graph info.
+        else if (key == 'p')
+        {
+            graph.print_petals();
+            graph.print_labels();
         }
         // Otherwise, performs computations to reduce error of packing
         else
