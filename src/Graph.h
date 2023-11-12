@@ -103,6 +103,7 @@ public:
     //----------------------------------------------------------
 
     static Graph example_graph_AxB(int A, int B);
+    static Graph W4_graph();
 
     const int &get_n() const { return n; }
 

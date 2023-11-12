@@ -11,15 +11,7 @@ Graph Graph::example_graph_AxB(int A, int B)
     if (A < 3 || B < 1)
     {
         // if the parameters are invalid, return a W4 graph
-        std::cout << "Please ensure A >= 3 and B >= 1" << std::endl;
-        graph.add_adjacency(0, 1);
-        graph.add_adjacency(1, 2);
-        graph.add_adjacency(2, 3);
-        graph.add_adjacency(3, 0);
-        graph.add_adjacency(4, 0);
-        graph.add_adjacency(4, 1);
-        graph.add_adjacency(4, 2);
-        graph.add_adjacency(4, 3);
+        return Graph::W4_graph();
     }
     else
     {
@@ -49,6 +41,28 @@ Graph Graph::example_graph_AxB(int A, int B)
                 graph.add_adjacency(circum * (rings - 1) + 1 + i % 2 + i / 2,
                                     circum * (rings - 1) + circum - i / 2 - 1);
     }
+
+    graph.auto_set_bounds();
+    graph.print_bounds();
+    graph.update_petals();
+
+    return graph;
+}
+
+// -------------------------------------------------------------------
+// Make
+Graph Graph::W4_graph()
+{
+    Graph graph;
+
+    graph.add_adjacency(0, 1);
+    graph.add_adjacency(1, 2);
+    graph.add_adjacency(2, 3);
+    graph.add_adjacency(3, 0);
+    graph.add_adjacency(4, 0);
+    graph.add_adjacency(4, 1);
+    graph.add_adjacency(4, 2);
+    graph.add_adjacency(4, 3);
 
     graph.auto_set_bounds();
     graph.print_bounds();

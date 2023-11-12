@@ -27,6 +27,7 @@ void ofApp::draw()
     ofBackground(circle_packing.get_theme() ? 255 : 0);
 
     circle_packing.show(last_key_pressed);
+    circle_packing.update_packing(20);
 }
 
 //--------------------------------------------------------------
