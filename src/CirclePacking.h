@@ -35,7 +35,7 @@ private:
             "RETURN : mode",
             "T : theme",
             "V : reset view",
-            "3-9 : n-gon"
+            "3-9 : n-gon",
             "UP/DOWN : increase/decrease target angle",
             "LEFT/RIGHT : navigate boundary vertices"}};
 

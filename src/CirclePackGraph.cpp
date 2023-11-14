@@ -419,9 +419,8 @@ void CirclePackGraph::add_vertex(int vertex_index_1, int vertex_index_2, int whe
             std::vector<int>::iterator it = std::find(petals.begin(), petals.end(), indices[i]);
             int petal_index = std::distance(petals.begin(), it);
             // There the vertex is a boundary and the other vertex is its last petal, skip
-            if (is_bound(indices[i]) && petal_index == len - 1)
+            if (is_bound(indices[i]) && is_bound(indices[1-i]) && petal_index == len - 1)
                 continue;
-
             int vertex_index_3 = petals[(petal_index + 1) % len];
             add_adjacency(new_vertex_index, vertex_index_3);
 
