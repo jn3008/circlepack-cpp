@@ -38,7 +38,6 @@
 class Graph
 {
 protected:
-    int n;
     std::vector<Vertex *> vertices;
 
     virtual void add_adjacency(int vertex_index_1, int vertex_index_2);
@@ -60,15 +59,11 @@ private:
 
 public:
     // -------------------------------------------------------------------
-    // Simple constructor for the class
-    Graph()
-    {
-        n = 0;
-    }
+    Graph() {}
 
     //----------------------------------------------------------
     // Copy constructor for deep copy.
-    Graph(const Graph &other) : n(other.n), adjacencies(other.adjacencies)
+    Graph(const Graph &other) : adjacencies(other.adjacencies)
     {
         for (const Vertex *v : other.vertices)
             vertices.push_back(v->clone());
@@ -95,7 +90,6 @@ public:
                 vertices.push_back(v->clone());
 
             // Assign stack members
-            n = other.n;
             adjacencies = other.adjacencies;
         }
         return *this;
@@ -105,7 +99,7 @@ public:
     static Graph example_graph_AxB(int A, int B);
     static Graph W4_graph();
 
-    const int &get_n() const { return n; }
+    const int get_n() const { return int(vertices.size()); }
 
     void auto_set_bounds();
 

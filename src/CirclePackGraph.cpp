@@ -11,42 +11,42 @@
 // Return copy of the label of a vertex with given index
 double CirclePackGraph::get_label(int vertex_index) const
 {
-    assert(vertex_index >= 0 && vertex_index < n);
+    assert(vertex_index >= 0 && vertex_index < get_n());
     return static_cast<CirclePackVertex *>(vertices[vertex_index])->get_label();
 }
 // -------------------------------------------------------------------
 // Set the value of the label of a vertex with given index
 void CirclePackGraph::set_label(int vertex_index, double val)
 {
-    assert(vertex_index >= 0 && vertex_index < n);
+    assert(vertex_index >= 0 && vertex_index < get_n());
     static_cast<CirclePackVertex *>(vertices[vertex_index])->set_label(val);
 }
 // -------------------------------------------------------------------
 // Return copy of the position of a vertex with given index
 ofVec2f CirclePackGraph::get_pos(int vertex_index) const
 {
-    assert(vertex_index >= 0 && vertex_index < n);
+    assert(vertex_index >= 0 && vertex_index < get_n());
     return static_cast<CirclePackVertex *>(vertices[vertex_index])->get_pos();
 }
 // -------------------------------------------------------------------
 // Set the value of the position of a vertex with given index
 void CirclePackGraph::set_pos(int vertex_index, const ofVec2f &val)
 {
-    assert(vertex_index >= 0 && vertex_index < n);
+    assert(vertex_index >= 0 && vertex_index < get_n());
     static_cast<CirclePackVertex *>(vertices[vertex_index])->set_pos(val);
 }
 // -------------------------------------------------------------------
 // Return copy of the target angle of a vertex with given index
 double CirclePackGraph::get_target_ang(int vertex_index) const
 {
-    assert(vertex_index >= 0 && vertex_index < n);
+    assert(vertex_index >= 0 && vertex_index < get_n());
     return static_cast<CirclePackVertex *>(vertices[vertex_index])->get_target_ang();
 }
 // -------------------------------------------------------------------
 // Set the value of the target angle of a vertex with given index
 void CirclePackGraph::set_target_ang(int vertex_index, double val)
 {
-    assert(vertex_index >= 0 && vertex_index < n);
+    assert(vertex_index >= 0 && vertex_index < get_n());
     static_cast<CirclePackVertex *>(vertices[vertex_index])->set_target_ang(val);
 }
 // -------------------------------------------------------------------
@@ -56,10 +56,11 @@ void CirclePackGraph::set_target_ang(int vertex_index, double val)
 // sum, the difference should be recompensated across all other boundary vertices
 void CirclePackGraph::adjust_target_ang(int boundary_vertex_index, double adjustment)
 {
-    assert(boundary_vertex_index >= 0 && boundary_vertex_index < n);
+    assert(boundary_vertex_index >= 0 && boundary_vertex_index < get_n());
     set_target_ang(boundary_vertex_index,
                    get_target_ang(boundary_vertex_index) + adjustment);
 
+    int n = get_n();
     // Count the number of boundary vertices
     int num_boundaries = 0;
     for (int i = 0; i < n; i++)
@@ -73,7 +74,7 @@ void CirclePackGraph::adjust_target_ang(int boundary_vertex_index, double adjust
 void CirclePackGraph::auto_set_targets()
 {
 
-    for (int i = 0; i < n; i++)
+    for (int i = 0; i < get_n(); i++)
     {
         if (!is_bound(i))
             set_target_ang(i, 2 * PI);
@@ -87,7 +88,7 @@ void CirclePackGraph::auto_set_targets()
 void CirclePackGraph::print_labels() const
 {
     std::cout << "----------------vertex-labels-----------------" << std::endl;
-    for (int i = 0; i < n; i++)
+    for (int i = 0; i < get_n(); i++)
         std::cout << i << ": " << get_label(i) << ", ";
     std::cout << std::endl;
 }
@@ -97,7 +98,7 @@ void CirclePackGraph::print_labels() const
 // new pointers to Vertex object into CirclePackVertex objects.
 void CirclePackGraph::add_adjacency(int vertex_index_1, int vertex_index_2)
 {
-    bool new_vertex_added = max(vertex_index_1, vertex_index_2) >= n;
+    bool new_vertex_added = max(vertex_index_1, vertex_index_2) >= get_n();
 
     Graph::add_adjacency(vertex_index_1, vertex_index_2);
 
@@ -118,7 +119,7 @@ void CirclePackGraph::add_adjacency(int vertex_index_1, int vertex_index_2)
 // Neighbour Model
 void CirclePackGraph::compute_labels_by_fixing_boundary_labels()
 {
-    for (int i = 0; i < n; i++)
+    for (int i = 0; i < get_n(); i++)
     {
         // Skip if the i'th vertex is a boundary or has no petals
         if (is_bound(i) || !exists(i))
@@ -142,7 +143,7 @@ void CirclePackGraph::compute_labels_by_fixing_boundary_labels()
 // which isn't 2*PI (unlike interior vertices which are 2*PI by default)
 void CirclePackGraph::compute_labels_by_fixing_boundary_targets()
 {
-    for (int i = 0; i < n; i++)
+    for (int i = 0; i < get_n(); i++)
     {
         // Skip if the i'th vertex has no petals
         if (!exists(i))
@@ -168,7 +169,7 @@ void CirclePackGraph::compute_labels_by_fixing_boundary_targets()
 // have been fixed.
 void CirclePackGraph::compute_positions()
 {
-    std::vector<bool> fixed(n, false);
+    std::vector<bool> fixed(get_n(), false);
 
     // Fix the position of two vertices.
     int A = 0;
@@ -196,7 +197,7 @@ void CirclePackGraph::compute_positions()
 double CirclePackGraph::get_error() const
 {
     double error = 0;
-    for (int i = 0; i < n; i++)
+    for (int i = 0; i < get_n(); i++)
         if (!is_bound(i) && exists(i))
             error += get_target_ang(i) - theta(i);
     return abs(error);
@@ -212,7 +213,7 @@ double CirclePackGraph::get_error() const
 // can all be undone at once.
 void CirclePackGraph::remove_and_fill(int vertex_index, std::vector<GraphOperation> &edit_to_graph)
 {
-    assert(vertex_index >= 0 && vertex_index < n);
+    assert(vertex_index >= 0 && vertex_index < get_n());
     std::vector<int> petals = get_petals(vertex_index);
 
     // Only push this edit to the history stack if the function
@@ -334,7 +335,7 @@ void CirclePackGraph::add_vertex(int vertex_index_1, int vertex_index_2, int whe
         int petal_index = std::distance(petals.begin(), it);
         int vertex_index_3 = petals[(petal_index + 1) % petals.size()];
 
-        int new_vertex_index = n;
+        int new_vertex_index = get_n();
         add_adjacency(new_vertex_index, vertex_index_1);
         add_adjacency(new_vertex_index, vertex_index_2);
         add_adjacency(new_vertex_index, vertex_index_3);
@@ -357,7 +358,7 @@ void CirclePackGraph::add_vertex(int vertex_index_1, int vertex_index_2, int whe
     {
         remove_adjacency(vertex_index_1, vertex_index_2);
 
-        int new_vertex_index = n;
+        int new_vertex_index = get_n();
         add_adjacency(new_vertex_index, vertex_index_1);
         add_adjacency(new_vertex_index, vertex_index_2);
 
@@ -564,7 +565,7 @@ void CirclePackGraph::recenter_scale(float width, float height)
     // the current positions and labels
     ofVec2f bound_max = ofVec2f(-9999, -9999);
     ofVec2f bound_min = ofVec2f(9999, 9999);
-    for (int i = 0; i < n; i++)
+    for (int i = 0; i < get_n(); i++)
     {
         if (!exists(i))
             continue;
@@ -580,7 +581,7 @@ void CirclePackGraph::recenter_scale(float width, float height)
     float scale_factor = min(width / (bound_max.x - bound_min.x), height / (bound_max.y - bound_min.y));
 
     // Update the positions and labels.
-    for (int i = 0; i < n; i++)
+    for (int i = 0; i < get_n(); i++)
     {
         ofVec2f pos = get_pos(i);
         pos -= bound_min * 0.5;
@@ -599,7 +600,7 @@ void CirclePackGraph::recenter_scale(float width, float height)
 // if nothing was found return a nullptr.
 Vertex *CirclePackGraph::get_circle_at_position(ofVec2f pos) const
 {
-    for (int i = 0; i < n; i++)
+    for (int i = 0; i < get_n(); i++)
     {
         if (!exists(i))
             continue;

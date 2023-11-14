@@ -75,7 +75,7 @@ Graph Graph::W4_graph()
 // Add a connection between a pair of vertices with given indices,
 // that is, set their adjacency value to 'true'.
 // If any of the indices are higher than the current total number of
-// vertices of the graph (minus 1) then adjust the members 'n',
+// vertices of the graph (minus 1) then adjust the members
 // 'adjacencies', 'vertices' accordingly.
 // This is virtual so that the CirclePackGraph can turn any new pointers
 // to Vertex objects into CirclePackVertex objects.
@@ -87,7 +87,7 @@ void Graph::add_adjacency(int vertex_index_1, int vertex_index_2)
 
     // Handle whether we're adding an edge with a vertex index
     // higher than the current number of vertices.
-    int old_n = n;
+    int old_n = get_n();
     int new_n = max(vertex_index_1, vertex_index_2) + 1;
     if (new_n > old_n)
     {
@@ -100,8 +100,6 @@ void Graph::add_adjacency(int vertex_index_1, int vertex_index_2)
             // Create new Vertex until the highest vertex index is reached
             vertices.push_back(new Vertex(i));
         }
-        // Update the value of n accordingly.
-        n = new_n;
     }
 
     adjacencies[max(vertex_index_1, vertex_index_2)][min(vertex_index_1, vertex_index_2)] = true;
@@ -113,7 +111,7 @@ void Graph::add_adjacency(int vertex_index_1, int vertex_index_2)
 void Graph::remove_adjacency(int vertex_index_1, int vertex_index_2)
 {
     std::cout << "Remove adjacency : (" << vertex_index_1 << "," << vertex_index_2 << ")" << std::endl;
-    assert(min(vertex_index_1, vertex_index_2) >= 0 && min(vertex_index_1, vertex_index_2) < n);
+    assert(min(vertex_index_1, vertex_index_2) >= 0 && min(vertex_index_1, vertex_index_2) < get_n());
     adjacencies[max(vertex_index_1, vertex_index_2)][min(vertex_index_1, vertex_index_2)] = false;
 }
 
@@ -125,7 +123,7 @@ void Graph::remove_adjacency(int vertex_index_1, int vertex_index_2)
 void Graph::auto_set_bounds()
 {
     update_petals();
-    for (int i = 0; i < n; i++)
+    for (int i = 0; i < get_n(); i++)
     {
         std::vector<int> petals = get_petals(i);
         bool is_boundary = !path_exists(petals, 1, true);
@@ -141,14 +139,14 @@ void Graph::auto_set_bounds()
 // Returns whether a vertex with given index is a boundary vertex
 bool Graph::is_bound(int vertex_index) const
 {
-    assert(vertex_index >= 0 && vertex_index < n);
+    assert(vertex_index >= 0 && vertex_index < get_n());
     return vertices[vertex_index]->is_bound();
 }
 // -------------------------------------------------------------------
 // Sets the boundary status of a vertex with given index
 void Graph::set_bound(int vertex_index, bool val)
 {
-    assert(vertex_index >= 0 && vertex_index < n);
+    assert(vertex_index >= 0 && vertex_index < get_n());
     vertices[vertex_index]->set_bound(val);
     return;
 }
@@ -159,14 +157,14 @@ void Graph::set_bound(int vertex_index, bool val)
 // describes a valid graph (that is a triangulation of a disc)
 std::vector<int> Graph::get_petals(int vertex_index) const
 {
-    assert(vertex_index >= 0 && vertex_index < n);
+    assert(vertex_index >= 0 && vertex_index < get_n());
     return vertices[vertex_index]->get_petals();
 }
 // -------------------------------------------------------------------
 // Set the petals of a vertex with given index.
 void Graph::set_petals(int vertex_index, const std::vector<int> &val)
 {
-    assert(vertex_index >= 0 && vertex_index < n);
+    assert(vertex_index >= 0 && vertex_index < get_n());
     vertices[vertex_index]->set_petals(val);
     return;
 }
@@ -174,7 +172,7 @@ void Graph::set_petals(int vertex_index, const std::vector<int> &val)
 // Get the petals of a vertex with given index.
 Vertex *Graph::get_petal_pointer_of(int vertex_index, int petal_index) const
 {
-    assert(vertex_index >= 0 && vertex_index < n);
+    assert(vertex_index >= 0 && vertex_index < get_n());
     std::vector<int> petals = get_petals(vertex_index);
     int len = petals.size();
 
@@ -199,7 +197,7 @@ Vertex *Graph::get_petal_pointer_of(int vertex_index, int petal_index) const
 void Graph::print_bounds() const
 {
     std::cout << "----------------boundary-vertices-----------------" << std::endl;
-    for (int i = 0; i < n; i++)
+    for (int i = 0; i < get_n(); i++)
         if (is_bound(i))
             std::cout << i << " ";
     std::cout << std::endl;
@@ -211,7 +209,7 @@ void Graph::print_bounds() const
 void Graph::print_adjacencies() const
 {
     std::cout << "----------------edges-----------------" << std::endl;
-    for (int i = 0; i < n; i++)
+    for (int i = 0; i < get_n(); i++)
     {
         for (int j = 0; j < adjacencies[i].size(); j++)
             std::cout << (adjacencies[i][j] ? 1 : 0) << " ";
@@ -246,14 +244,14 @@ void Graph::print_petals() const
 void Graph::update_petals()
 {
     // Set each vertex's petals to be the computed ordered petals.
-    for (int i = 0; i < n; i++)
+    for (int i = 0; i < get_n(); i++)
     {
         set_petals(i, find_ordered_petals(i));
     }
 
     // Init a bool vector to keep track of indices of vertices whose
     // petals' orientation has been fixed in place.
-    std::vector<bool> orientation_fixed(n, false);
+    std::vector<bool> orientation_fixed(get_n(), false);
 
     // Arbitrarily choose a first vertex.
     int first = 0;
@@ -280,7 +278,7 @@ void Graph::update_petals()
 // adjacent. There is an assertion to ensure that the indices are valid.
 bool Graph::is_adjacent(int vertex_index_1, int vertex_index_2) const
 {
-    assert(min(vertex_index_1, vertex_index_2) >= 0 && max(vertex_index_1, vertex_index_2) > n);
+    assert(min(vertex_index_1, vertex_index_2) >= 0 && max(vertex_index_1, vertex_index_2) > get_n());
     return adjacencies[max(vertex_index_1, vertex_index_2)][min(vertex_index_1, vertex_index_2)] > 0;
 }
 
@@ -290,7 +288,7 @@ bool Graph::is_adjacent(int vertex_index_1, int vertex_index_2) const
 int Graph::dist(int vertex_index_1, int vertex_index_2) const
 {
     // Set distance to -1 to mark as unexplored
-    std::vector<int> distance(n, -1);
+    std::vector<int> distance(get_n(), -1);
 
     // distance from vertex vertex_index_1 to vertex vertex_index_1 is 0
     distance[vertex_index_1] = 0;
@@ -320,7 +318,7 @@ int Graph::dist(int vertex_index_1, int vertex_index_2) const
 std::vector<int> Graph::find_unordered_petals(int vertex_index) const
 {
     std::vector<int> ret;
-    for (int i = 0; i < n; i++)
+    for (int i = 0; i < get_n(); i++)
         if (is_adjacent(vertex_index, i))
             ret.push_back(i);
     return ret;
@@ -436,7 +434,7 @@ void Graph::fix_orientation(int vertex_index, const std::array<int, 2> &dir, std
 // exlucde it from relevant calculations.
 bool Graph::exists(int vertex_index) const
 {
-    if (vertex_index < 0 || vertex_index > n - 1)
+    if (vertex_index < 0 || vertex_index > get_n() - 1)
         return false;
     return get_petals(vertex_index).size() > 0;
 }
