@@ -11,6 +11,7 @@ The main algorithm used to compute the circle packing is based on an implementat
 
 ![gif_about1](doc/gif_about1.gif)
 ![gif_about2](doc/gif_about2.gif)
+![gif_about2](doc/gif_ngon.gif)
 
 <!-- 
 The animation is generative, that is, changing the random seed will result in a different outcome.
@@ -51,6 +52,7 @@ Select two vertices. These two vertices have two mutual petals (one if they're b
 | **RETURN** | Toggle mode |
 | **T** | Toggle theme |
 | **V** | Reset view |
+| **P** | Print graph info to console |
 ### 'Fixed boundary labels' mode
 | Input | Description |
 | ----------- | ----------- |
@@ -66,6 +68,7 @@ Select two vertices. These two vertices have two mutual petals (one if they're b
 | **LEFT CLICK** | Select vertex |
 | **UP/DOWN** | Increase/decrease boundary angle |
 | **LEFT/RIGHT** | Navigate boundary vertices |
+| **0**-**9** | Set boundary targets to n-gon |
 
 
 
