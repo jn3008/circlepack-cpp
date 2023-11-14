@@ -54,6 +54,8 @@ void ofApp::keyPressed(int key)
         last_key_pressed = "RIGHT ARROW";
     else if (key == OF_KEY_LEFT)
         last_key_pressed = "LEFT ARROW";
+    else if (key >= '3' && key <= '9')
+        last_key_pressed = std::to_string(key-'0');
 }
 
 //--------------------------------------------------------------

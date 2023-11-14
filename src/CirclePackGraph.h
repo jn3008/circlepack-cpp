@@ -75,6 +75,7 @@ public:
     void set_target_ang(int vertex_index, double val);
     void adjust_target_ang(int boundary_vertex_index, double adjustment);
     void auto_set_targets();
+    void set_ngon_target_ang(int ngon);
 
     void print_labels() const;
 

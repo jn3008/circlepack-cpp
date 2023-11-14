@@ -35,6 +35,7 @@ private:
             "RETURN : mode",
             "T : theme",
             "V : reset view",
+            "3-9 : n-gon"
             "UP/DOWN : increase/decrease target angle",
             "LEFT/RIGHT : navigate boundary vertices"}};
 
@@ -358,6 +359,12 @@ public:
         {
             graph.print_petals();
             graph.print_labels();
+        }
+        // If a digit is pressed in the second mode
+        else if (mode && key >= '3' && key <= '9')
+        {
+            graph.set_ngon_target_ang(key-'0');
+            update_packing(50);
         }
         // Otherwise, performs computations to reduce error of packing
         else

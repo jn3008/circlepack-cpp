@@ -84,6 +84,46 @@ void CirclePackGraph::auto_set_targets()
 }
 
 // -------------------------------------------------------------------
+void CirclePackGraph::set_ngon_target_ang(int ngon)
+{
+    // Check there are vertices
+    if (get_n() < 1)
+        return;
+
+    // Find all boundary vertices in order.
+    // To do this, first find any one, then keeping adding
+    // the latest one's first petal until we reach the first again
+    int first_boundary_index = 0;
+    while (!is_bound(first_boundary_index))
+        first_boundary_index++;
+
+    std::vector<int> boundary_indices{first_boundary_index};
+    while (get_petals(boundary_indices.back())[0] != boundary_indices.front())
+        boundary_indices.push_back(get_petals(boundary_indices.back())[0]);
+
+    // Check there's enough boundary vertices
+    if (boundary_indices.size() < ngon)
+        return;
+
+    // Now set the angle sum targets. We must choose 'ngon' vertices to be 
+    // the corners, which will each have angle PI*(ngon-2) / ngon while
+    // the rest will be PI (flat edge).
+
+    float angle = PI*(ngon-2)/ngon;
+    for (int i = 0; i < ngon; i++)
+    {
+        int rdm_index = rand()%boundary_indices.size();
+        set_target_ang(boundary_indices[rdm_index], angle);
+        boundary_indices.erase(boundary_indices.begin()+rdm_index);
+    }
+    while (!boundary_indices.empty())
+    {
+        set_target_ang(boundary_indices.back(), PI);
+        boundary_indices.pop_back();
+    }
+}
+
+// -------------------------------------------------------------------
 // Print the label of each vertex
 void CirclePackGraph::print_labels() const
 {

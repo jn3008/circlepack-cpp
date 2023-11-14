@@ -81,14 +81,17 @@ Graph Graph::W4_graph()
 // to Vertex objects into CirclePackVertex objects.
 void Graph::add_adjacency(int vertex_index_1, int vertex_index_2)
 {
-    std::cout << "Add adjacency : (" << vertex_index_1 << "," << vertex_index_2 << ")" << std::endl;
+    int min_vertex_index = min(vertex_index_1, vertex_index_2);
+    int max_vertex_index = max(vertex_index_1, vertex_index_2);
     // Ensure no vertex index is negative
-    assert(min(vertex_index_1, vertex_index_2) >= 0);
+    if (min_vertex_index < 0)
+        return;
+    std::cout << "Add adjacency : (" << vertex_index_1 << "," << vertex_index_2 << ")" << std::endl;
 
     // Handle whether we're adding an edge with a vertex index
     // higher than the current number of vertices.
     int old_n = get_n();
-    int new_n = max(vertex_index_1, vertex_index_2) + 1;
+    int new_n = max_vertex_index + 1;
     if (new_n > old_n)
     {
         for (int i = old_n; i < new_n; i++)
@@ -102,17 +105,36 @@ void Graph::add_adjacency(int vertex_index_1, int vertex_index_2)
         }
     }
 
-    adjacencies[max(vertex_index_1, vertex_index_2)][min(vertex_index_1, vertex_index_2)] = true;
+    adjacencies[max_vertex_index][min_vertex_index] = true;
 }
 
 // -------------------------------------------------------------------
 // Remove a connection between a pair of vertices with given indices,
 // that is, set their adjacency value to false.
+// If this removed connection leaves the vertex of highest index with
+// no remaining vertices, then delete it.
 void Graph::remove_adjacency(int vertex_index_1, int vertex_index_2)
 {
+    int min_vertex_index = min(vertex_index_1, vertex_index_2);
+    int max_vertex_index = max(vertex_index_1, vertex_index_2);
+    int n = get_n();
+    // Ensure no vertex index is negative, and both exist
+    if (min_vertex_index < 0 || max_vertex_index >= n)
+        return;
     std::cout << "Remove adjacency : (" << vertex_index_1 << "," << vertex_index_2 << ")" << std::endl;
-    assert(min(vertex_index_1, vertex_index_2) >= 0 && min(vertex_index_1, vertex_index_2) < get_n());
-    adjacencies[max(vertex_index_1, vertex_index_2)][min(vertex_index_1, vertex_index_2)] = false;
+    adjacencies[max_vertex_index][min_vertex_index] = false;
+
+    // The last vertex in the last has one adjacency remaining (the one being removed)
+    if (max_vertex_index == n - 1)
+    {
+        if (std::count(adjacencies[max_vertex_index].begin(),
+                       adjacencies[max_vertex_index].end(), true) < 1)
+        {
+            delete vertices.back();
+            vertices.pop_back();
+            adjacencies.pop_back();
+        }
+    }
 }
 
 // -------------------------------------------------------------------
@@ -349,16 +371,12 @@ std::vector<int> Graph::find_ordered_petals(int vertex_index) const
         // isn't a boundary, loop and swap until it is.
         // std::cout <<vertex_index<<", "<< ret[0] << ", " << is_bound(vertex_index) << ", " << !is_bound(ret[0])  << std::endl;
         if (is_bound(vertex_index) && !is_bound(ret[0]))
-        {
             for (int i = 1; i < n_petals; i++)
-            {
                 if (is_bound(ret[i]))
                 {
                     std::swap(ret[0], ret[i]);
                     break;
                 }
-            }
-        }
 
         // Search for a path through petals, search for a closed path
         // if it isn't a boundary vertex.
